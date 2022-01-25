@@ -7,7 +7,8 @@ let puzzle = "";
 const wordlePrompt = {
   type: "text",
   name: "word",
-  message: "Enter a 5 letter word..."
+  message: "Enter a 5 word...",
+  validate: value => value.length != 5 ? 'Word must be 5 letters' : true
 };
 
 async function check(guess) {
@@ -34,8 +35,8 @@ async function check(guess) {
 }
 
 async function play(tries) {
-  // the user gets 5 tries to solve the puzzle
-  if (tries < 5) {
+  // the user gets 5 tries to solve the puzzle not including the first guess
+  if (tries < 6) {
     // ask the player for a guess word
     const response = await prompts(wordlePrompt);
     const guess = response.word.toUpperCase();
