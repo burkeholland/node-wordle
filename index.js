@@ -12,26 +12,32 @@ const wordlePrompt = {
 };
 
 async function check(guess) {
-  let results = [];
-  // loop over each letter in the word
-  for (let i in guess) {
-    let attempt = { letter: guess[i], color: "bgGrey" };
+  let puzzleCopy = puzzle;
+  const colors = Array(guess.length).fill(chalk.white.bgGrey);
+  // loop through guess and mark green if fully correct
+  for (let i = 0; i < guess.length; i++) {
     // check if the letter at the specified index in the guess word exactly
     // matches the letter at the specified index in the puzzle
-    if (attempt.letter === puzzle[i]) {
-      process.stdout.write(chalk.white.bgGreen.bold(` ${guess[i]} \t`));
-      continue;
+    if (guess[i] === puzzleCopy[i]) {
+      colors[i] = chalk.white.bgGreen;
+      // remove letter from answer, so it's not scored again
+      puzzleCopy = puzzleCopy.replace(guess[i], " ");
     }
+  }
+  // loop through guess and mark yellow if partially correct
+  for (let i = 0; i < guess.length; i++) {
     // check if the letter at the specified index in the guess word is at least
     // contained in the puzzle at some other position
-    if (puzzle.includes(attempt.letter)) {
-      process.stdout.write(chalk.white.bgYellow.bold(` ${guess[i]} \t`));
-      continue;
+    if (guess[i] !== puzzleCopy[i] && puzzleCopy.includes(guess[i])) {
+      colors[i] = chalk.white.bgYellow;
+      // remove letter from answer, so it's not scored again
+      puzzleCopy = puzzleCopy.replace(guess[i], " ");
     }
-    // otherwise the letter doesn't exist at all in the puzzle
-    process.stdout.write(chalk.white.bgGrey.bold(` ${guess[i]} \t`));
   }
-  return results;
+  // loop over each letter and use its color to print it
+  for (let i = 0; i < guess.length; i++) {
+    process.stdout.write(colors[i].bold(` ${guess[i]} \t`));
+  }
 }
 
 async function play(tries) {
